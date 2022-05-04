@@ -52,6 +52,15 @@ class Cart with ChangeNotifier {
       total += value.price * value.quantity;
     });
     return total;
+  }
+
+  void removeItem(String id) {
+    _items.remove(id);
+    notifyListeners();
+  }
+
+  void clear() {
+    _items = {};
     notifyListeners();
   }
 }

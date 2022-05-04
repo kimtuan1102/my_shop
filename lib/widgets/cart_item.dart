@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_complete_guide/providers/cart.dart';
+import 'package:provider/provider.dart';
 
 /**
  * Created by Trinh Kim Tuan.
@@ -20,22 +22,39 @@ class CartItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-      child: Padding(
-        padding: EdgeInsets.all(10),
-        child: ListTile(
-          title: Text(title),
-          subtitle: Text('Total: \$ ${price* quantity}'),
-          leading: CircleAvatar(
-            child: FittedBox(
-              child: Padding(
-                padding: EdgeInsets.all(5),
-                child: Text(title),
+    final cart = Provider.of<Cart>(context, listen: false);
+
+    return Dismissible(
+      key: ValueKey(id),
+      background: Container(
+        color: Colors.red,
+        child: Icon(
+          Icons.delete,
+          size: 40,
+          color: Colors.white,
+        ),
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.only(right: 10),
+      ),
+      direction: DismissDirection.endToStart,
+      onDismissed: (direction) => cart.removeItem(id),
+      child: Card(
+        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+        child: Padding(
+          padding: EdgeInsets.all(10),
+          child: ListTile(
+            title: Text(title),
+            subtitle: Text('Total: \$ ${price * quantity}'),
+            leading: CircleAvatar(
+              child: FittedBox(
+                child: Padding(
+                  padding: EdgeInsets.all(5),
+                  child: Text(title),
+                ),
               ),
             ),
+            trailing: Text('${quantity.toString()}x'),
           ),
-          trailing: Text(quantity.toString()),
         ),
       ),
     );
