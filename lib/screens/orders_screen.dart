@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_complete_guide/providers/orders.dart' show Orders;
+import 'package:flutter_complete_guide/widgets/app_drawer.dart';
 import 'package:flutter_complete_guide/widgets/order_item.dart';
 import 'package:provider/provider.dart';
 
@@ -11,6 +12,7 @@ import 'package:provider/provider.dart';
 class OrdersScreen extends StatelessWidget {
   const OrdersScreen({Key? key}) : super(key: key);
 
+  static const routeName = '/orders';
   @override
   Widget build(BuildContext context) {
     final ordersData = Provider.of<Orders>(context);
@@ -25,6 +27,7 @@ class OrdersScreen extends StatelessWidget {
         ),
         itemCount: ordersData.orders.length,
       ),
+      drawer: AppDrawer(),
     );
   }
 }
