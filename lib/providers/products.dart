@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_complete_guide/providers/product.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 /**
  * Created by Trinh Kim Tuan.
  * Date:  5/4/2022
@@ -46,7 +48,7 @@ class Products with ChangeNotifier {
   bool _showFavorites = false;
 
   List<Product> get items {
-    if(_showFavorites) {
+    if (_showFavorites) {
       return _items.where((element) => element.isFavorite == true).toList();
     }
     return [..._items];
@@ -56,8 +58,34 @@ class Products with ChangeNotifier {
     return _items.firstWhere((element) => element.id == productId);
   }
 
-  void addProduct() {
-    // _items.add(value)
+  Future<void> addProduct(Product product) {
+    const url =
+        'https://shop-app-bc0e1-default-rtdb.firebaseio.com/products';
+    return http
+        .post(Uri.parse(url),
+            body: json.encode({
+              "title": product.title,
+              "price": product.price,
+              "description": product.description,
+              "imageUrl": product.imageUrl
+            }))
+        .then((value) {
+      product.id = json.decode(value.body)['name'];
+      _items.add(product);
+      notifyListeners();
+    });
+  }
+
+  void updateProduct(String id, Product product) {
+    final idxProduct = _items.indexWhere((element) => element.id == id);
+    if (idxProduct > 0) {
+      _items[idxProduct] = product;
+    } else {}
+    notifyListeners();
+  }
+
+  void deleteProduct(String id) {
+    _items.removeWhere((element) => element.id == id);
     notifyListeners();
   }
 
