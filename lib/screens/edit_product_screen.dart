@@ -64,7 +64,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     final isValid = _form.currentState?.validate();
     if (!isValid!) {
       return;
@@ -78,10 +78,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
           .updateProduct(_editedProduct.id, _editedProduct);
     } else {
       _editedProduct.id = DateTime.now().toString();
-      Provider.of<Products>(context, listen: false)
-          .addProduct(_editedProduct)
-          .catchError((error) {
-        return showDialog(
+      try {
+        await Provider.of<Products>(context, listen: false)
+            .addProduct(_editedProduct);
+      } catch (error) {
+        await showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
                   title: Text('An error occured'),
@@ -94,18 +95,17 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         child: Text('OK'))
                   ],
                 ));
-      }).then((_) {
+      } finally {
         setState(() {
           _isLoading = false;
         });
-      });
+        Navigator.of(context).pop();
+      }
     }
     print(_editedProduct.title);
     print(_editedProduct.price);
     print(_editedProduct.description);
     print(_editedProduct.imageUrl);
-
-    Navigator.of(context).pop();
   }
 
   @override
