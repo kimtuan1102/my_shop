@@ -49,7 +49,7 @@ class Auth with ChangeNotifier {
     final userData = json.encode({
       'token': _token,
       'userId': _userId,
-      'expiredTime': _expiredTime
+      'expiredTime': _expiredTime.toIso8601String()
     });
     prefs.setString('userData', userData);
     notifyListeners();
@@ -79,12 +79,14 @@ class Auth with ChangeNotifier {
     _autoLogout();
     return true;
   }
-  void logout() {
+  Future<void> logout() async{
     _token = '';
     _expiredTime = DateTime.now();
     _userId = '';
     _authTimer?.cancel();
     _authTimer = null;
+    final prefs = await SharedPreferences.getInstance();
+    prefs.clear();
     notifyListeners();
   }
 
