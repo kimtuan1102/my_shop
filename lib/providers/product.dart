@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:flutter_complete_guide/models/http_exception.dart';
+import 'package:http/http.dart' as http;
 
 class Product with ChangeNotifier {
   String _id;
@@ -62,8 +66,29 @@ class Product with ChangeNotifier {
         _isFavorite = isFavorite ?? false;
 
   //Method
-  void toggleFavoriteStatus() {
-    this._isFavorite = !this._isFavorite;
+  void _setFavoriteStatus(bool status) {
+    _isFavorite = status;
     notifyListeners();
+  }
+
+  Future<void> toggleFavoriteStatus(String token, String userId) async{
+    final url =
+        "https://shop-app-bc0e1-default-rtdb.firebaseio.com/userFavorites/$userId/$id.json?auth=$token";
+    final _oldStatus = _isFavorite;
+    _isFavorite = !_isFavorite;
+    _setFavoriteStatus(_isFavorite);
+    try {
+      final response = await http.patch(Uri.parse(url), body: json.encode({
+        'isFavorite': _isFavorite
+      }));
+      if(response.statusCode > 400) {
+        _setFavoriteStatus(_oldStatus);
+        throw HttpException('Update favorite status failed');
+      }
+    }
+    catch(error) {
+      _setFavoriteStatus(_oldStatus);
+      throw error;
+    }
   }
 }
